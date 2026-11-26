@@ -20,9 +20,10 @@
 .cart-clear {
   background: none;
   border: 0;
-  color: #dc2626;
+  color: #b91c1c;
   font-weight: 600;
   font-size: 0.9rem;
+  padding: 8px 4px;
 }
 .cart-clear:hover { text-decoration: underline; }
 
@@ -57,13 +58,17 @@
 .cart-remove {
   background: none;
   border: 0;
-  color: #dc2626;
+  color: #b91c1c;
   font-weight: 600;
-  padding: 4px;
+  padding: 8px 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
+.cart-remove svg { width: 18px; height: 18px; }
 .cart-remove:hover { text-decoration: underline; }
 .cart-item-total {
-  font-weight: 800;
+  font-weight: 700;
   font-size: 1.1rem;
   color: var(--primary-dark);
   white-space: nowrap;
@@ -72,15 +77,15 @@
 .cart-summary {
   padding: 24px;
   position: sticky;
-  top: 140px;
+  top: 96px;
 }
 .cart-summary h2 { font-size: 1.2rem; margin-bottom: 16px; font-weight: 800; }
 .summary-row {
   display: flex;
   justify-content: space-between;
   padding: 10px 0;
-  color: #555;
-  border-bottom: 1px solid #f0f0f0;
+  color: #4a514b;
+  border-bottom: 1px solid #eef0ee;
 }
 .summary-total {
   font-size: 1.1rem;
@@ -96,17 +101,42 @@
   margin: 12px 0 18px;
   line-height: 1.6;
 }
+/* WhatsApp brand green fails contrast with white text; the darker teal keeps the brand cue and passes AA. */
 .whatsapp-btn {
   width: 100%;
   margin-bottom: 10px;
-  background: #25D366;
-  border-color: #25D366;
+  padding-block: 14px;
+  font-size: 1rem;
+  background: #128C7E;
+  border-color: #128C7E;
 }
-.whatsapp-btn:hover { background: #1fb458; border-color: #1fb458; }
+.whatsapp-btn:hover { background: #075E54; border-color: #075E54; }
 
+.cart-checkout-bar { display: none; }
+
+/* On phones the summary sits below every item, so checkout stays reachable from a fixed bar. */
 @media (max-width: 980px) {
-  .cart-layout { grid-template-columns: 1fr; }
+  .cart-layout { grid-template-columns: 1fr; padding-bottom: 88px; }
   .cart-summary { position: static; }
+  .cart-summary .whatsapp-btn { display: none; }
+  .cart-checkout-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 90;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    background: #fff;
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -8px 24px rgba(17, 24, 39, 0.06);
+  }
+  .cart-checkout-bar > div { display: flex; flex-direction: column; line-height: 1.3; }
+  .cart-checkout-bar span { font-size: 0.82rem; color: var(--text-muted); }
+  .cart-checkout-bar strong { font-size: 1.2rem; color: var(--primary-dark); }
+  .cart-checkout-bar .whatsapp-btn { width: auto; margin: 0; flex: 1; max-width: 240px; }
 }
 @media (max-width: 640px) {
   .cart-item {

@@ -5,7 +5,7 @@ export const categories = [
     slug: 'cosmetics',
     description: 'منتجات عناية شخصية وتجميل مختارة بعناية لمنزلك وعائلتك.',
     icon: 'sparkle',
-    image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1779056904689-ff99fd0045a4?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'cleaners',
@@ -13,7 +13,7 @@ export const categories = [
     slug: 'cleaners',
     description: 'منظفات منزلية فعالة لكل ركن في بيتك.',
     icon: 'bottle',
-    image: 'https://images.unsplash.com/photo-1585421514738-01798e348b17?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1626379481874-3dc5678fa8ca?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'industrial',
@@ -21,7 +21,7 @@ export const categories = [
     slug: 'industrial',
     description: 'حلول تنظيف قوية للاستخدامات المهنية والمصانع والمنشآت.',
     icon: 'factory',
-    image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1744681984533-ce43dce4cc70?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'groceries',
@@ -29,7 +29,7 @@ export const categories = [
     slug: 'groceries',
     description: 'مستلزمات يومية ومنتجات جردوات بجودة عالية وأسعار مناسبة.',
     icon: 'basket',
-    image: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1577369117918-7e3785e39cb7?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'wholesale',
@@ -37,7 +37,7 @@ export const categories = [
     slug: 'wholesale',
     description: 'اشترِ بالكراتين ووفر أكثر مع أسعار الجملة المميزة.',
     icon: 'box',
-    image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1513672494107-cd9d848a383e?auto=format&fit=crop&w=800&q=80',
   },
   {
     id: 'offers',

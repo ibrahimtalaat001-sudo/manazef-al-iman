@@ -1,21 +1,41 @@
-import { useMemo, useState, useEffect } from 'react';
+import { MagnifyingGlass } from '@phosphor-icons/react';
+import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import ProductGrid from '../components/ProductGrid';
 import { categories } from '../data/categories';
 import { products } from '../data/products';
 import './CategoryPage.css';
 
+const ALL_BRANDS = 'all';
+
 const sortOptions = [
-  { value: 'default', label: 'الترتيب الافتراضي' },
+  { value: 'default', label: 'الترتيب: المقترح' },
   { value: 'price-asc', label: 'الأقل سعرًا' },
   { value: 'price-desc', label: 'الأعلى سعرًا' },
   { value: 'best', label: 'الأكثر مبيعًا' },
   { value: 'newest', label: 'الأحدث' },
 ];
 
+function sortProducts(list, sort) {
+  const sorted = [...list];
+  if (sort === 'price-asc') sorted.sort((a, b) => a.price - b.price);
+  if (sort === 'price-desc') sorted.sort((a, b) => b.price - a.price);
+  if (sort === 'best') sorted.sort((a, b) => Number(b.bestSeller) - Number(a.bestSeller));
+  if (sort === 'newest') sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  return sorted;
+}
+
 export default function CategoryPage() {
   const { slug } = useParams();
+  // Keying on the slug resets every filter when the shopper switches category.
+  return <CategoryListing key={slug} slug={slug} />;
+}
+
+function CategoryListing({ slug }) {
   const category = categories.find((c) => c.slug === slug);
+  const [search, setSearch] = useState('');
+  const [brand, setBrand] = useState(ALL_BRANDS);
+  const [sort, setSort] = useState('default');
 
   const baseProducts = useMemo(() => {
     if (slug === 'offers') return products.filter((p) => p.originalPrice && p.originalPrice > p.price);
@@ -25,56 +45,29 @@ export default function CategoryPage() {
 
   const brands = useMemo(() => [...new Set(baseProducts.map((p) => p.brand))].sort(), [baseProducts]);
 
-  const [search, setSearch] = useState('');
-  const [brand, setBrand] = useState('all');
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
-  const [sort, setSort] = useState('default');
-
-  useEffect(() => {
-    setSearch('');
-    setBrand('all');
-    setMinPrice('');
-    setMaxPrice('');
-    setSort('default');
-  }, [slug]);
-
   const filtered = useMemo(() => {
-    let list = [...baseProducts];
-    const q = search.trim().toLowerCase();
-    if (q) list = list.filter((p) => p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q));
-    if (brand !== 'all') list = list.filter((p) => p.brand === brand);
-    const min = minPrice === '' ? null : Number(minPrice);
-    const max = maxPrice === '' ? null : Number(maxPrice);
-    if (min !== null && !Number.isNaN(min)) list = list.filter((p) => p.price >= min);
-    if (max !== null && !Number.isNaN(max)) list = list.filter((p) => p.price <= max);
+    const term = search.trim().toLowerCase();
+    const matches = baseProducts.filter((p) => {
+      if (brand !== ALL_BRANDS && p.brand !== brand) return false;
+      if (!term) return true;
+      return p.name.toLowerCase().includes(term) || p.brand.toLowerCase().includes(term);
+    });
+    return sortProducts(matches, sort);
+  }, [baseProducts, search, brand, sort]);
 
-    switch (sort) {
-      case 'price-asc':
-        list.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        list.sort((a, b) => b.price - a.price);
-        break;
-      case 'best':
-        list.sort((a, b) => Number(b.bestSeller) - Number(a.bestSeller));
-        break;
-      case 'newest':
-        list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        break;
-      default:
-        break;
-    }
-    return list;
-  }, [baseProducts, search, brand, minPrice, maxPrice, sort]);
+  const hasActiveFilters = search.trim() !== '' || brand !== ALL_BRANDS;
+  const clearFilters = () => {
+    setSearch('');
+    setBrand(ALL_BRANDS);
+  };
 
   if (!category) {
     return (
       <div className="container section">
         <div className="empty-state">
-          <div className="empty-icon">🔎</div>
+          <div className="empty-icon" aria-hidden="true"><MagnifyingGlass weight="duotone" /></div>
           <h3>القسم غير موجود</h3>
-          <p>لم نتمكن من العثور على هذا القسم.</p>
+          <p>ارجع للرئيسية واختر قسمًا من القائمة.</p>
           <Link to="/" className="btn btn-primary" style={{ marginTop: 16 }}>العودة للرئيسية</Link>
         </div>
       </div>
@@ -82,90 +75,67 @@ export default function CategoryPage() {
   }
 
   return (
-    <>
-      <div className="page-hero">
-        <div className="container">
-          <div className="breadcrumb">
-            <Link to="/">الرئيسية</Link>
-            <span>/</span>
-            <span>{category.name}</span>
-          </div>
+    <section className="page">
+      <div className="container">
+        <nav className="breadcrumb" aria-label="مسار التنقل">
+          <Link to="/">الرئيسية</Link>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">{category.name}</span>
+        </nav>
+        <header className="page-head">
           <h1>{category.name}</h1>
           <p>{category.description}</p>
-        </div>
-      </div>
+        </header>
 
-      <section className="section">
-        <div className="container category-layout">
-          <aside className="filters-panel">
-            <div className="filters-head">
-              <h2>تصفية المنتجات</h2>
-              <button
-                type="button"
-                className="filters-clear"
-                onClick={() => { setSearch(''); setBrand('all'); setMinPrice(''); setMaxPrice(''); setSort('default'); }}
-              >
-                مسح
-              </button>
-            </div>
-
-            <label className="filter-field">
-              <span>بحث داخل القسم</span>
-              <input
-                type="search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="اسم المنتج أو الشركة..."
-              />
-            </label>
-
-            <label className="filter-field">
-              <span>الشركة / الماركة</span>
-              <select value={brand} onChange={(e) => setBrand(e.target.value)}>
-                <option value="all">كل الماركات</option>
-                {brands.map((b) => <option key={b} value={b}>{b}</option>)}
-              </select>
-            </label>
-
-            <div className="filter-field">
-              <span>السعر (جنيه)</span>
-              <div className="price-inputs">
-                <input
-                  type="number"
-                  min="0"
-                  value={minPrice}
-                  onChange={(e) => setMinPrice(e.target.value)}
-                  placeholder="من"
-                />
-                <input
-                  type="number"
-                  min="0"
-                  value={maxPrice}
-                  onChange={(e) => setMaxPrice(e.target.value)}
-                  placeholder="إلى"
-                />
-              </div>
-            </div>
-
-            <label className="filter-field">
-              <span>الترتيب</span>
-              <select value={sort} onChange={(e) => setSort(e.target.value)}>
-                {sortOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-            </label>
-          </aside>
-
-          <div className="category-results">
-            <div className="results-bar">
-              <p>عدد المنتجات المعروضة: <strong>{filtered.length}</strong></p>
-            </div>
-            <ProductGrid
-              products={filtered}
-              emptyMessage="جرّب تغيير البحث أو الفلاتر لعرض منتجات أخرى."
+        <div className="listing-toolbar">
+          <label className="listing-search">
+            <MagnifyingGlass aria-hidden="true" />
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={`ابحث في ${category.name}`}
+              aria-label={`البحث في ${category.name}`}
             />
-          </div>
+          </label>
+          <select
+            className="listing-sort"
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            aria-label="ترتيب المنتجات"
+          >
+            {sortOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
         </div>
-      </section>
-    </>
+
+        {brands.length > 1 && (
+          <div className="brand-chips" role="group" aria-label="تصفية حسب الماركة">
+            {[ALL_BRANDS, ...brands].map((b) => (
+              <button
+                key={b}
+                type="button"
+                className={`chip ${brand === b ? 'active' : ''}`}
+                aria-pressed={brand === b}
+                onClick={() => setBrand(b)}
+              >
+                {b === ALL_BRANDS ? 'كل الماركات' : b}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="results-bar">
+          <p aria-live="polite">{filtered.length} منتج</p>
+          {hasActiveFilters && (
+            <button type="button" className="link-btn" onClick={clearFilters}>مسح التصفية</button>
+          )}
+        </div>
+
+        <ProductGrid
+          products={filtered}
+          emptyMessage="جرّب كلمة أخرى أو اختر كل الماركات."
+        />
+      </div>
+    </section>
   );
 }

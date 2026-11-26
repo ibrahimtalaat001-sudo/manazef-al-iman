@@ -1,3 +1,4 @@
+import { Basket } from '@phosphor-icons/react';
 import ProductCard from './ProductCard';
 import './ProductGrid.css';
 
@@ -5,7 +6,7 @@ export default function ProductGrid({ products, emptyMessage = 'لا توجد م
   if (!products.length) {
     return (
       <div className="empty-state">
-        <div className="empty-icon">🧺</div>
+        <div className="empty-icon" aria-hidden="true"><Basket weight="duotone" /></div>
         <h3>لا توجد منتجات</h3>
         <p>{emptyMessage}</p>
       </div>
